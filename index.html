@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Vue.js and API using Axios</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="initial-scale=1.0">
+    <!-- Call Vue.js via CDN for templating -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.min.js"></script>
+    <!-- Call Axios via CDN for API calls -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.min.js"></script>
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans%7COswald" rel="stylesheet">
+    <!-- Bootstrap 3 cdn -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+    <!-- Custom Styles -->
+    <link rel="stylesheet" type="text/css" href="styles.css">
+</head>
+<body class="wrapper">
+    <template id="app">
+    <!-- Beginning of block of template code with the ID of 'app'. The <template> tag doesn't do anything except block the W3C validators -->
+    <div  class="container" >
+        <div class="row">
+            <div class="col-sm-6">
+            <h1>Recommended Summer Reading</h1>
+        <nav>
+            <ol title="Check out my personal favorites &amp; new finds:">
+                <li><a href="index.html?q=9780465050659">The Design of Everyday Things</a></li>
+                <li><a href="index.html?q=9781479894093">Accessible America</a></li>
+                <li><a href="index.html?q=9780385540681">The Translation of Love</a></li>
+                <li><a href="index.html?q=9781772754247">A Room of One's Own</a></li>
+                <li><a href="index.html?q=9780375842207">The Book Thief</a></li>
+                <li><a href="index.html?q=9780007539826">Long After Midnight</a></li>
+                <li><a href="index.html?q=9780061793059">Neverwhere: A Novel</a></li>
+            </ol>
+        </nav>
+        <form action="index.html" method="get">
+             <label>Or find a different book! Search by ISBN (ISBN-10 or ISBN-13)</label>
+             <input type="text" name="q">
+             <button type="submit">Search for book</button>
+        </form>
+    </div>
+            <!-- Did something go wrong? The message below will display. Check the Console to see what the error
+            message is, as well. -->
+            <section v-if="errored">
+                <li>We're sorry, we're not able to retrieve this information at the moment, please try back later</li>
+            </section>
+            <!-- This is where we loop through the results of our API call if it was successful. -->
+            <div v-for="results in info" class="bookInfo">
+                <div class="col-sm-6">
+                <img v-bind:src="results.volumeInfo.imageLinks.thumbnail">
+                <h1>{{ results.volumeInfo.title }}</h1>
+                <h2>{{ results.volumeInfo.subtitle }}</h2>
+                <ul title="Additional Book Info">
+                    <li><strong>Written by: </strong>{{results.volumeInfo.authors[0]}}</li>
+                    <li><strong>Published by: </strong> {{results.volumeInfo.publisher}}</li>
+                    <li><strong>Published on: </strong> {{results.volumeInfo.publishedDate }}</li>
+                    <li><strong>Print Type: </strong>{{results.volumeInfo.printType}}</li>
+                    <li><strong>Language: </strong>{{results.volumeInfo.language}}</li>
+                    <li><strong>Genre: </strong> {{results.volumeInfo.categories[0]}}</li>
+                    <li><strong>Average Rating: </strong>{{results.volumeInfo.averageRating}}</li>
+                    <li><strong>Number of Ratings: </strong>{{results.volumeInfo.ratingsCount}}</li>
+                    <li><strong>Page Count: </strong> {{results.volumeInfo.pageCount}} page(s)</li>
+                    <li><strong>PDF Available: </strong> {{results.accessInfo.epub.isAvailable}}</li>
+                    <li><strong>Public Domain Title: </strong> {{ results.accessInfo.publicDomain}}</li>
+                    <li><strong>ISBN 10: </strong>{{results.volumeInfo.industryIdentifiers[0].identifier}}</li>
+                    <li><strong>ISBN 13: </strong> {{results.volumeInfo.industryIdentifiers[1].identifier}}</li>
+                    <li><strong>Description: </strong> {{ results.volumeInfo.description }}</li>
+                </ul>
+                   <!--Below is the entirety of the results object displayed so that you can pick and choose
+                all the information you need to display. Voila!
+                <h2>Raw data from the API call (remove when you are done developing this page)</h2>
+                <pre>{{ results }}</pre>
+                -->
+         </div>
+       </div>
+    </div>
+        </div>
+        </template>
+    <!-- End of block of template code -->
+    <!-- Block of code that makes the API call, then puts the data into an object called 'info'
+    and finally, allows use of the data in an HTML object with the ID of 'app'. -->
+    <script>
+        let queryString = document.URL.substring(document.URL.indexOf('=') + 1);
+        new Vue({
+            el: '#app',
+            data() {
+                return {
+                    info: null,
+                    loading: true,
+                    errored: false
+                }
+            },
+            mounted() {
+                axios
+                    // can replace that URL with any available API that
+                    // supports the GET method
+                    .get('https://www.googleapis.com/books/v1/volumes?q=isbn:' + queryString)
+                    // The line below helps pull the pertinent data from the call into the
+                    // info object. Specifically, we only need what's in the items part of
+                    // the API response
+                    .then(response => {
+                        this.info = response.data.items // change response.data.items if your API call does not have a data.items object in it. Not all APIs are built the same!
+                    })
+                    .catch(error => {
+                        console.log(error)
+                        this.errored = true
+                    })
+                    .finally(() => this.loading = false)
+            }
+        })
+    </script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+</body>
+</html>

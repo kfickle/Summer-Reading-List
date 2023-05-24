@@ -1,0 +1,43 @@
+body {
+    background-color: #fcfdff;
+    margin: 0 auto;
+    font-family: 'Open Sans', sans-serif;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-family: 'Oswald', sans-serif;
+    color: navy;
+}
+
+.wrapper {
+    padding: 3em;
+}
+
+ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+a {
+        color: darkblue;
+}
+ul[title]::before,
+ol[title]::before {
+    content: attr(title);
+    /* then add some nice styling as needed, eg: */
+    display: block;
+    font-weight: bold;
+    text-transform: uppercase;
+    font-size: 1.2em;
+}
+ol li {
+    margin-left: 2em;
+}
+.bookInfo {
+    padding-top: 1em;
+}
